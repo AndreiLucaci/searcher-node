@@ -21,8 +21,14 @@
     "@electron-forge/plugin-fuses": "^7.4.0",
     "@electron-forge/plugin-webpack": "^7.4.0",
     "@electron/fuses": "^1.8.0",
+    "@types/": "leeoniya/ufuzzy",
+    "@types/fuzzy-search": "^2.1.5",
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",
+    "@types/react-file-icon": "^1.0.4",
+    "@types/react-virtualized": "^9.21.30",
+    "@types/react-window": "^1.8.8",
+    "@types/uuid": "^10.0.0",
     "@typescript-eslint/eslint-plugin": "^5.0.0",
     "@typescript-eslint/parser": "^5.0.0",
     "@vercel/webpack-asset-relocator-loader": "1.7.3",
@@ -47,6 +53,7 @@
     "@babel/preset-env": "^7.25.3",
     "@babel/preset-react": "^7.24.7",
     "@babel/preset-typescript": "^7.24.7",
+    "@electron/remote": "^2.1.2",
     "@emotion/react": "^11.13.0",
     "@emotion/styled": "^11.13.0",
     "@fontsource/roboto": "^5.0.14",
@@ -55,9 +62,21 @@
     "babel-loader": "^9.1.3",
     "electron-squirrel-startup": "^1.0.1",
     "fuse.js": "^7.0.0",
+    "fuzzy-search": "^3.2.1",
     "glob": "^11.0.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "rxjs": "^7.8.1"
+    "react-file-icon": "^1.5.0",
+    "react-virtualized": "^9.22.5",
+    "react-window": "^1.8.10",
+    "rxjs": "^7.8.1",
+    "use-debounce": "^10.0.2",
+    "uuid": "^10.0.0"
+  },
+  "browser": {
+    "fs": false,
+    "fs/promises": false,
+    "path": false,
+    "child_process": false
   }
 }

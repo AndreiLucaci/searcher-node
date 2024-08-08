@@ -28,6 +28,9 @@
 
 import "./index.css";
 import "./app";
+import { Engine } from "./engine/engine";
+
+const engine = new Engine();
 
 console.log(
   '👋 This message is being logged by "renderer.js", included via webpack'

@@ -4,11 +4,12 @@ import ListItemText from "@mui/material/ListItemText";
 import ListItemAvatar from "@mui/material/ListItemAvatar";
 import Avatar from "@mui/material/Avatar";
 import ImageIcon from "@mui/icons-material/Image";
-import { Dirent } from "node:fs";
 import { Store } from "../stores";
+import { ExtendedDirent } from "../utils/types";
+import { FileIcon, defaultStyles } from "react-file-icon";
 
 export type FileListItemProps = {
-  value: Dirent;
+  value: ExtendedDirent;
 };
 
 export const FileListItem: React.FC<FileListItemProps> = (
@@ -20,10 +21,20 @@ export const FileListItem: React.FC<FileListItemProps> = (
 
   return (
     <ListItem onDoubleClick={onDoubleClick}>
-      <ListItemAvatar>
-        <Avatar>
-          <ImageIcon />
-        </Avatar>
+      <ListItemAvatar
+        sx={{
+          maxHeight: "32px",
+          minWidth: "32px",
+          maxWidth: "32px",
+          width: "32px",
+        }}
+      >
+        <FileIcon
+          extension={props.value.ext}
+          {...defaultStyles[
+            props.value.ext as unknown as keyof typeof defaultStyles
+          ]}
+        />
       </ListItemAvatar>
       <ListItemText
         primary={props.value.name}

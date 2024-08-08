@@ -1,13 +1,19 @@
 import { createRoot } from "react-dom/client";
 
-import { Header } from "./components/header";
+import { Grid } from "@mui/material";
 import { Body } from "./components/body";
+import { Header } from "./components/header";
 
-const root = createRoot(document.body);
+const root = createRoot(document.getElementById("root"));
 const body = (
-  <>
-    <Header />
-    <Body />
-  </>
+  <Grid container spacing={2} justifyContent="flex-start">
+    <Grid item xs={12}>
+      <Header />
+    </Grid>
+    <Grid item xs={12}>
+      <Body />
+    </Grid>
+  </Grid>
 );
+
 root.render(body);

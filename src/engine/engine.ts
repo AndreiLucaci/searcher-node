@@ -1,12 +1,14 @@
-import { readdir } from "node:fs/promises";
-import { Dirent } from "node:fs";
 import { Store } from "../stores";
-import Fuse from "fuse.js";
 import { distinctUntilChanged } from "rxjs";
-import { exec } from "child_process";
+import { Constants } from "../utils/constants";
+import { ElectronApiWindow } from "../utils/electronApi";
+import { ExtendedDirent } from "../utils/types";
+import FuzzySearch from "fuzzy-search";
 
-const getCommandLine = () => {
-  switch (process.platform) {
+const getCommandLine = async () => {
+  const electronWindow = window as unknown as ElectronApiWindow;
+
+  switch (await electronWindow.electronAPI.platform()) {
     case "darwin":
       return "open";
     case "win32":
@@ -17,33 +19,46 @@ const getCommandLine = () => {
 };
 
 export class Engine {
-  validLookupFiles = [".ppt", ".pptx"];
+  validLookupFiles = Constants.normalizedFileTypes;
 
   constructor() {
-    Store.$fileToBeOpened.pipe(distinctUntilChanged()).subscribe((value) => {
-      exec(getCommandLine() + " " + value.parentPath);
+    Store.$fileToBeOpened
+      .pipe(distinctUntilChanged())
+      .subscribe(async (value) => {
+        if (!value) return;
+
+        const electronWindow = window as unknown as ElectronApiWindow;
+        const commandLine = await getCommandLine();
+        const command = `${commandLine} ${value.parentPath}/${value.name}`;
+        console.log("Executing " + command);
+        await electronWindow.electronAPI.exec(command);
+      });
+
+    Store.$searchTerm.pipe(distinctUntilChanged()).subscribe((value) => {
+      if (!value) return;
+
+      this.lookupFile(value);
     });
 
     this.initializeLookup();
   }
 
-  async initializeLookup(): Promise<Dirent[]> {
-    const files = await readdir("./", {
-      recursive: true,
-      withFileTypes: true,
-    });
+  async initializeLookup(): Promise<ExtendedDirent[]> {
+    const electronWindow = window as unknown as ElectronApiWindow;
 
-    console.log(`found ${files.length} files`);
-
-    const pptFiles = files.filter(
-      (x) =>
-        x.isFile() &&
-        this.validLookupFiles.some((y) => x.parentPath.endsWith(y))
+    const files = await electronWindow.electronAPI.readdir(
+      await electronWindow.electronAPI.__dirname()
+      // remote.app.getAppPath()
+    );
+    const filteredFiles = files.filter((x) =>
+      this.validLookupFiles.includes(x.ext)
     );
 
-    Store.$discoveredFiles.next(pptFiles);
+    console.log(`found ${filteredFiles.length} files`);
 
-    return pptFiles;
+    Store.$discoveredFiles.next(filteredFiles);
+
+    return filteredFiles;
   }
 
   lookupFile(value: string): void {
@@ -51,10 +66,12 @@ export class Engine {
 
     if (!existingFiles.length) return;
 
-    const fuse = new Fuse(existingFiles, {
-      keys: ["name"],
+    const searcher = new FuzzySearch(existingFiles, ["name"], {
+      caseSensitive: false,
+      sort: true,
     });
-    const filteredResult = fuse.search(value);
+
+    const filteredResult = searcher.search(value);
 
     Store.$filteredFiles.next(filteredResult);
   }

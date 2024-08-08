@@ -1,42 +1,61 @@
-import React, { useState } from "react";
-import { Store } from "../stores";
-import { Dirent } from "node:fs";
-import { List } from "@mui/material";
-import { FileListItem } from "./listItem";
+import { Box, List } from "@mui/material";
+import { useEffect, useState } from "react";
 import { distinctUntilChanged } from "rxjs";
+import { Store } from "../stores";
+import { ExtendedDirent } from "../utils/types";
+import { FileListItem } from "./listItem";
 
-export const Body: React.FC = () => {
-  const [showAllFiles, setShowAllFiles] = useState(true);
+export const Body = () => {
+  // const [searchTerm, setSearchTerm] = useState("");
+  // const [showAllFiles, setShowAllFiles] = useState(true);
+  const [files, setFiles] = useState<ExtendedDirent[]>([]);
+  // const [filteredFiles, setFilteredFiles] = useState<ExtendedDirent[]>([]);
 
-  Store.$searchTerm.pipe(distinctUntilChanged()).subscribe((value) => {
-    if (value) {
-      setShowAllFiles(false);
-    } else {
-      setShowAllFiles(true);
-    }
-  });
+  useEffect(() => {
+    // Store.$searchTerm.pipe(distinctUntilChanged()).subscribe((value) => {
+    //   if (value !== searchTerm) {
+    //     setSearchTerm(value);
+    //     if (value) {
+    //       setShowAllFiles(false);
+    //     } else {
+    //       setShowAllFiles(true);
+    //     }
+    //   }
+    // });
 
-  const renderFiles = () => {
-    let files: Dirent[] = [];
+    Store.$discoveredFiles.pipe(distinctUntilChanged()).subscribe((value) => {
+      setFiles(value);
+    });
 
-    if (showAllFiles) {
-      files = Store.$discoveredFiles.value;
-    } else {
-      files = Store.$filteredFiles.value
-        .sort((a, b) => a.refIndex - b.refIndex)
-        .map((x) => x.item);
-    }
-
-    return files.map((file) => (
-      <FileListItem key={file.parentPath} value={file} />
-    ));
-  };
+    Store.$filteredFiles.pipe(distinctUntilChanged()).subscribe((value) => {
+      if (value.length > 0) {
+        setFiles(value);
+      } else {
+        setFiles(Store.$discoveredFiles.value);
+      }
+    });
+  }, []);
 
   return (
-    <div>
-      <List sx={{ width: "100%", maxWidth: 360, bgcolor: "background.paper" }}>
-        {/* {renderFiles()} */}
+    <Box
+      sx={{
+        height: "80vh",
+      }}
+    >
+      <List
+        sx={{
+          width: "100%",
+
+          maxWidth: "100vw",
+          bgcolor: "background.paper",
+          overflow: "auto",
+          maxHeight: "100%",
+        }}
+      >
+        {files.map((file) => (
+          <FileListItem value={file} key={file.id} />
+        ))}
       </List>
-    </div>
+    </Box>
   );
 };
