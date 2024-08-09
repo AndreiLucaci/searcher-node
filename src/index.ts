@@ -84,8 +84,14 @@ ipcMain.handle("exec", async (event, command) => {
   });
 });
 
+ipcMain.handle("getConfig", async (event) => {
+  // const config = fs.readFileSync(path.join(__dirname, "config.json"), "utf-8");
+});
+
 ipcMain.handle("__dirname", async (event) => {
-  return Promise.resolve(app.getAppPath());
+  const dirPath = path.parse(app.getPath("exe")).dir;
+  const actualPath = path.normalize(path.join(dirPath, "../../.."));
+  return Promise.resolve(actualPath);
 });
 
 // This method will be called when Electron has finished

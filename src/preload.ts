@@ -8,6 +8,7 @@ contextBridge.exposeInMainWorld("electronAPI", {
   exec: (command: string) => ipcRenderer.invoke("exec", command),
   platform: () => ipcRenderer.invoke("platform"),
   __dirname: () => ipcRenderer.invoke("__dirname"),
+  getConfig: () => ipcRenderer.invoke("getConfig"),
 } as ElectronAPI);
 
 console.log("loaded the preload");

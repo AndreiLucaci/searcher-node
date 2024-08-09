@@ -1,4 +1,4 @@
-const knownFileTypes = [".ppt", ".pptx"];
+const knownFileTypes = [".ppt", ".pptx", ".ts"];
 
 export const Constants = {
   knownFileTypes,

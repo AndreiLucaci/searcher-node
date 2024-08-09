@@ -9,3 +9,7 @@ export type ExtendedDirent = DirentType & {
   normalizedName: string;
   fullPath: string;
 };
+
+export type Config = {
+  folderPath: string;
+};
